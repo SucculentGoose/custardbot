@@ -1,2 +1,2 @@
 # custardbot
-its a custard bot
+its a custard fotd discord bot
