@@ -8,7 +8,7 @@
     "run": "node index.js",
     "deploy": "node deploy-commands.js"
   },
-  "author": "Jon Van Steen",
+  "author": "SucculentGoose",
   "license": "ISC",
   "dependencies": {
     "axios": "1.2.2",
