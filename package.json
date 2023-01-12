@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "run": "node index.js",
+    "start": "node index.js",
     "deploy": "node deploy-commands.js"
   },
   "author": "SucculentGoose",
@@ -14,6 +14,7 @@
     "axios": "1.2.2",
     "discord.js": "14.7.1",
     "dotenv": "16.0.3",
+    "jssoup": "0.0.15",
     "underscore": "1.13.6"
   }
 }
