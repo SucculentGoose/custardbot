@@ -7,7 +7,7 @@ const upcomingFotds   = require('../upcomingFotds');
 
 module.exports = {
   data: new SlashCommandBuilder()
-  .setName('upcomingcream')
+  .setName('futurecream')
   .setDescription('Lists the upcoming fotds for the week')
   .addStringOption(option => {
     return option.setName('zipcode')
