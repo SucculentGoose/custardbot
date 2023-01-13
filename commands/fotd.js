@@ -57,7 +57,14 @@ module.exports = {
 
       const embedFotd = embedder.createFlavorOfTheDayEmbed(location);
 
-      await interaction.reply({embeds: [embedFotd]});
+      const message = await interaction.reply({embeds: [embedFotd], fetchReply: true});
+      try {
+        await message.react('🔥');
+        await message.react('🤮');
+        await message.react('🍦');
+      } catch(ex) {
+        console.error('Sorry an error occurred reacting: ' + ex);
+      }
     }
   }
 };
