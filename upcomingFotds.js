@@ -1,6 +1,7 @@
 const _ = require('underscore');
 var JSSoup = require('jssoup').default;
 const axios = require('axios');
+const embedder = require('./helpers/embedder');
 
 async function generateUpcomingFotdString(location) {
   const response = await axios.get(`${location.Url}#upcomming`);
@@ -35,11 +36,11 @@ async function generateUpcomingFotdString(location) {
         }
         flavorsArray.push(flavorObj);
       });
-      let string = `Upcoming flavors for ${location.City} are:\n`
+      const upcomingFotds = [];
       _.each(flavorsArray, flavor => {
-        string += `On ${flavor.date} the flavor of the day will be ${flavor.flavor}\n${flavor.img}\n`;
+        upcomingFotds.push(embedder.createUpCommingFotdEmbeds(location.City, flavor.date, flavor.flavor, flavor.img));
       });
-      return string;
+      return upcomingFotds;
   } else {
     // say nothing found for this location :(
       return `Nothing found for the city ${location.City}`;

@@ -31,7 +31,11 @@ module.exports = {
         return;
       }
       const upcomingFlavorOfTheDays = await upcomingFotds.generateUpcomingFotdString(location);
-      await interaction.editReply(upcomingFlavorOfTheDays);
+      if (_.isString(upcomingFlavorOfTheDays)) {
+        await interaction.editReply(upcomingFlavorOfTheDays);
+      } else if (_.isArray(upcomingFlavorOfTheDays) && upcomingFlavorOfTheDays.length) {
+        await interaction.editReply({embeds: upcomingFlavorOfTheDays});
+      }
     } catch (ex) {
       interaction.editReply('Sorry an error occurred :( ' + ex.message);
     }
