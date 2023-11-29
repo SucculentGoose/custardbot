@@ -16,17 +16,22 @@ class Embedder {
   }
 
   createFlavorOfTheDayEmbed(location) {
+    const metadata = location.metadata;
+    const restaurantUrl = `https://www.culvers.com/restaurants/${metadata.slug}`
+    const imageUrl = `https://cdn.culvers.com/menu-item-detail/${metadata.flavorOfDaySlug}`
+
     return this.createEmbeddedItem('Flavor of the Day 🍦',
-     location.Url,
-     `The flavor 🤤 of the day 📅 at ${location.City}, ${location.State} 🗺️ is ${location.FlavorDay} 🍦`,
-     location.FlavorImageUrl);
+     restaurantUrl,
+     `The flavor 🤤 of the day 📅 at ${metadata.city}, ${metadata.state} 🗺️ is ${metadata.flavorOfDayName} 🍦`,
+     imageUrl);
   }
 
   createMultiFlavorOfTheDayEmbeds(location) {
+    const metadata = location.metadata
     return this.createEmbeddedItem(
-      `Flavor of the Day 🍦 at ${location.City}`,
+      `Flavor of the Day 🍦 at ${metadata.city}`,
       undefined,
-      `The flavor 🤤 of the day 📅 located ${location.Distance} miles away 🚗 at ${location.Address} ${location.City}, ${location.State} 🗺️ is ${location.FlavorDay} 🍦`,
+      `The flavor 🤤 of the day 📅 located at ${metadata.street} ${metadata.city}, ${metadata.state} 🗺️ is ${metadata.flavorOfDayName} 🍦`,
       location.FlavorImageUrl
     );
   }

@@ -9,18 +9,15 @@ class NetworkCalls {
    */
   async fetchAllCulversLocations(zipcode, wantAllLocations) {
     try {
-      const response = await axios.get(`https://www.culvers.com/api/locate/address/json?address=${zipcode}`);
-      const data = response.data;
-      if (!data.Collection?.Locations) {
-        return undefined;
-      }
-      if (!data.Collection.Locations.length) {
+      const response = await axios.get(`https://www.culvers.com/api/restaurants/getLocations?location=${zipcode}`);
+      const data = response.data?.data;
+      if (!data.geofences?.length) {
         return undefined;
       }
       if (!wantAllLocations) {
-        return data.Collection.Locations[0];
+        return data.geofences[0];
       }
-      return data.Collection.Locations;
+      return data.geofences;
     } catch (ex) {
       console.error(`An error occurred: ${ex.message}`);
       return undefined;
