@@ -22,7 +22,7 @@ class Embedder {
 
     return this.createEmbeddedItem('Flavor of the Day 🍦',
      restaurantUrl,
-     `The flavor 🤤 of the day 📅 at ${metadata.city}, ${metadata.state} 🗺️ is ${metadata.flavorOfDayName} 🍦`,
+     `The flavor 🤤 of the day 📅 at ${metadata.city}, ${metadata.state} 🗺️ is ${metadata.flavorOfDayName || 'NOTHING 🫡'} 🍦`,
      imageUrl);
   }
 
