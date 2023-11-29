@@ -1,14 +1,23 @@
 const _ = require('underscore');
+const cheerio = require('cheerio');
 var JSSoup = require('jssoup').default;
 const axios = require('axios');
 const embedder = require('./helpers/embedder');
+const networkCalls = require('./network/networkCalls');
 
 async function generateUpcomingFotdString(location) {
-  const response = await axios.get(`${location.Url}#upcomming`);
+  const response = await axios.get(`${networkCalls.getRestaurantUrl(location)}#view-calendar`);
   const data = response.data;
+
+  const $ = cheerio.load(data);
+
+  const upcomingPanel = $('#calendar-panel-upcoming');
+  console.log();
+  return;
+
   const soup = new JSSoup(data);
-  const fotdUpcoming = soup.find('div', 'fotdlist-unordered');
-  const contents = fotdUpcoming.contents;
+  const fotdUpcoming = soup.find('div', 'calendar-panel-upcoming');
+  const contents = fotdUpcoming?.contents;
   if (_.isArray(contents) && contents.length) {
       const flavorsArray = [];
       _.each(contents, content => {

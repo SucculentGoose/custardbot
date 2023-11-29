@@ -1,4 +1,5 @@
 const { EmbedBuilder } = require("@discordjs/builders");
+const networkCalls = require("../network/networkCalls");
 
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -17,11 +18,10 @@ class Embedder {
 
   createFlavorOfTheDayEmbed(location) {
     const metadata = location.metadata;
-    const restaurantUrl = `https://www.culvers.com/restaurants/${metadata.slug}`
     const imageUrl = `https://cdn.culvers.com/menu-item-detail/${metadata.flavorOfDaySlug}`
 
     return this.createEmbeddedItem('Flavor of the Day 🍦',
-     restaurantUrl,
+     networkCalls.getRestaurantUrl(location),
      `The flavor 🤤 of the day 📅 at ${metadata.city}, ${metadata.state} 🗺️ is ${metadata.flavorOfDayName || 'NOTHING 🫡'} 🍦`,
      imageUrl);
   }

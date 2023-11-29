@@ -1,6 +1,13 @@
 const axios = require('axios');
 
 class NetworkCalls {
+
+  getRestaurantUrl(location) {
+    if (location?.metadata?.slug) {
+      return `https://www.culvers.com/restaurants/${location?.metadata?.slug}`
+    }
+  }
+
   /**
    * Makes a request to fetch the Culvers locations at a given zipcode.
    * @param {string} zipcode - the zip code to use when looking up a list of locations

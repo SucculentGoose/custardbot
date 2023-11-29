@@ -26,11 +26,18 @@ module.exports = {
       return;
     }
     try {
-      if (!_.isString(location.Url) || !location.Url?.length) {
+      if (!_.isString(location.metadata?.slug) || !location.metadata?.slug.length) {
         interaction.editReply(stringGenerator.noCulversString(zipcode));
         return;
       }
-      const upcomingFlavorOfTheDays = await upcomingFotds.generateUpcomingFotdString(location);
+      let upcomingFlavorOfTheDays;
+      try {
+        upcomingFlavorOfTheDays = await upcomingFotds.generateUpcomingFotdString(location);
+      } catch (ex) {
+        await interaction.editReply('Something went wrong :(')
+        return;
+      }
+      
       if (_.isString(upcomingFlavorOfTheDays)) {
         await interaction.editReply(upcomingFlavorOfTheDays);
       } else if (_.isArray(upcomingFlavorOfTheDays) && upcomingFlavorOfTheDays.length) {
