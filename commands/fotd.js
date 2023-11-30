@@ -53,10 +53,12 @@ module.exports = {
       // just make sure we actually got something
       if (_.isUndefined(location)) {
         interaction.reply(stringGenerator.noCulversString(zipcode));
+        return;
       }
 
-      if (location.metadata.isTemporarilyClosed) {
+      if (location?.metadata?.isTemporarilyClosed) {
         interaction.reply(stringGenerator.culversTempClosed(zipcode));
+        return;
       }
 
       const embedFotd = embedder.createFlavorOfTheDayEmbed(location);
