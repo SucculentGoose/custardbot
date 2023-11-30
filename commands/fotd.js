@@ -55,6 +55,10 @@ module.exports = {
         interaction.reply(stringGenerator.noCulversString(zipcode));
       }
 
+      if (location.metadata.isTemporarilyClosed) {
+        interaction.reply(stringGenerator.culversTempClosed(zipcode));
+      }
+
       const embedFotd = embedder.createFlavorOfTheDayEmbed(location);
 
       const message = await interaction.reply({embeds: [embedFotd], fetchReply: true});
