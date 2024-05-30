@@ -13,7 +13,6 @@ async function scrapeUpcomingFotds(city) {
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto(url);
-    await page.waitForTimeout(1000)
 
     const upcomingCount = await page.locator('//div[starts-with(@class, \'RestaurantCalendarPanel_containerItem_\')]').count()
     const flavors = [];
