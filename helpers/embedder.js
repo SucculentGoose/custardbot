@@ -52,7 +52,7 @@ class Embedder {
       description = `Tomorrow the flavor of the day will be ${flavor}`
     } else {
       title = `Upcoming flavor for ${city}`;
-      description = `On ${date} the flavor of the day will be ${flavor}`;
+      description = `On ${date}, the flavor of the day will be ${flavor}`;
     }
 
     return this.createEmbeddedItem(
