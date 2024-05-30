@@ -41,17 +41,20 @@ class Embedder {
     // Do some checking to see if the date we are adding matches todays date.
     // If it does, dont use Upcoming and instead use Today's flavor for title and
     // Today the flavor of the day for the description
-    let title = `Upcoming flavor for ${city}`;
-    let description = `On ${date} the flavor of the day will be ${flavor}`;
+    let title;
+    let description;
 
-    const jsDate = new Date();
-    const dayOfWeek = weekdays[jsDate.getDay()];
-    const month = months[jsDate.getMonth()];
-    const dayOfMonth = jsDate.getDate().toString();
-    if (date === `${dayOfWeek}, ${month} ${dayOfMonth}`) {
+    if (date.startsWith('TODAY')) {
       title = `Today's flavor for ${city}`;
       description = `Today the flavor of the day will be ${flavor}`
+    } else if (date.startsWith('TOMORROW')) {
+      title = `Tomorrow's flavor for ${city}`;
+      description = `Tomorrow the flavor of the day will be ${flavor}`
+    } else {
+      title = `Upcoming flavor for ${city}`;
+      description = `On ${date} the flavor of the day will be ${flavor}`;
     }
+
     return this.createEmbeddedItem(
       title,
       undefined,

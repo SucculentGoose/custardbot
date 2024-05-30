@@ -4,6 +4,7 @@ const {SlashCommandBuilder} = require('discord.js');
 const networkCalls    = require('../network/networkCalls');
 const stringGenerator = require('../helpers/stringGenerator');
 const upcomingFotds   = require('../upcomingFotds');
+const scraper = require('../helpers/scraper');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -32,7 +33,7 @@ module.exports = {
       }
       let upcomingFlavorOfTheDays;
       try {
-        upcomingFlavorOfTheDays = await upcomingFotds.generateUpcomingFotdString(location);
+        upcomingFlavorOfTheDays = await scraper.scrapeUpcomingFotds(location.metadata.slug);
       } catch (ex) {
         await interaction.editReply('Something went wrong :(')
         return;

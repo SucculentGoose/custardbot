@@ -16,6 +16,10 @@
     "discord.js": "14.7.1",
     "dotenv": "16.0.3",
     "jssoup": "0.0.15",
+    "playwright": "^1.44.1",
     "underscore": "1.13.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.1"
   }
 }
