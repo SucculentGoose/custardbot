@@ -6,7 +6,8 @@ async function scrapeUpcomingFotds(city) {
     const url = `https://www.culvers.com/restaurants/${city}?tab=upcoming`
 
     const launchOptions = {
-        headless: true
+        headless: true,
+        executablePath: '/usr/bin/chromium-browser'
     }
     const browser = await playwright['chromium'].launch(launchOptions);
     const context = await browser.newContext();
@@ -35,6 +36,8 @@ async function scrapeUpcomingFotds(city) {
         upcomingFotds.push(embedder.createUpCommingFotdEmbeds(city, flavor.day, flavor.name, flavor.img))
     }
 }
+
+scrapeUpcomingFotds('escanaba')
 
 module.exports = {
     scrapeUpcomingFotds
