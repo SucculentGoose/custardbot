@@ -2,8 +2,8 @@ const playwright = require('playwright');
 const embedder = require('./embedder');
 
 
-async function scrapeUpcomingFotds(city) {
-    const url = `https://www.culvers.com/restaurants/${city}?tab=upcoming`
+async function scrapeUpcomingFotds(locationMetadata) {
+    const url = `https://www.culvers.com/restaurants/${locationMetadata.slug}?tab=upcoming`
 
     const launchOptions = {
         headless: true,
@@ -20,19 +20,20 @@ async function scrapeUpcomingFotds(city) {
         const dayLocator = await page.locator(`//*[@id="calendar-panel-upcoming"]/div/div[${i}]/h3`)
         const dayText = await dayLocator.textContent();
         const flavorLocator = await page.locator(`//*[@id="calendar-panel-upcoming"]/div/div[${i}]/div[2]/div[1]/a`)
-        const flavorName = await flavorLocator.textContent()
-        const flavorImg = `https://www.culvers.com${await flavorLocator.getAttribute('href')}`
+        const flavorName = await flavorLocator.textContent();
+        const imageLocator = await page.locator('//*[@id="calendar-panel-upcoming"]/div/div[1]/div[1]/a/img')
+        const flavorImg = await imageLocator.getAttribute('srcset');
         flavors.push({
             day: dayText,
             name: flavorName,
-            img: flavorImg
+            imageUrl: flavorImg
         });
     }
     await browser.close();
 
     const upcomingFotds = [];
     for (const flavor of flavors) {
-        upcomingFotds.push(embedder.createUpCommingFotdEmbeds(city, flavor.day, flavor.name, flavor.img))
+        upcomingFotds.push(embedder.createUpCommingFotdEmbeds(locationMetadata.city, flavor.day, flavor.name, flavor.imageUrl))
     }
     return upcomingFotds;
 }

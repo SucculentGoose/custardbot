@@ -44,10 +44,10 @@ class Embedder {
     let title;
     let description;
 
-    if (date.startsWith('TODAY')) {
+    if (date.startsWith('Today')) {
       title = `Today's flavor for ${city}`;
       description = `Today the flavor of the day will be ${flavor}`
-    } else if (date.startsWith('TOMORROW')) {
+    } else if (date.startsWith('Tomorrow')) {
       title = `Tomorrow's flavor for ${city}`;
       description = `Tomorrow the flavor of the day will be ${flavor}`
     } else {

@@ -33,7 +33,7 @@ module.exports = {
       }
       let upcomingFlavorOfTheDays;
       try {
-        upcomingFlavorOfTheDays = await scraper.scrapeUpcomingFotds(location.metadata.slug);
+        upcomingFlavorOfTheDays = await scraper.scrapeUpcomingFotds(location.metadata);
       } catch (ex) {
         await interaction.editReply('Something went wrong :(')
         return;
