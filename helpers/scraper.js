@@ -35,6 +35,7 @@ async function scrapeUpcomingFotds(city) {
     for (const flavor of flavors) {
         upcomingFotds.push(embedder.createUpCommingFotdEmbeds(city, flavor.day, flavor.name, flavor.img))
     }
+    return upcomingFotds;
 }
 
 module.exports = {
