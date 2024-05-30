@@ -37,8 +37,6 @@ async function scrapeUpcomingFotds(city) {
     }
 }
 
-scrapeUpcomingFotds('escanaba')
-
 module.exports = {
     scrapeUpcomingFotds
 }
