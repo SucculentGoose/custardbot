@@ -22,11 +22,12 @@ async function scrapeUpcomingFotds(locationMetadata) {
         const flavorLocator = await page.locator(`//*[@id="calendar-panel-upcoming"]/div/div[${i}]/div[2]/div[1]/a`)
         const flavorName = await flavorLocator.textContent();
         const imageLocator = await page.locator('//*[@id="calendar-panel-upcoming"]/div/div[1]/div[1]/a/img')
-        const flavorImg = await imageLocator.getAttribute('srcset');
+        const flavorImg = await imageLocator.getAttribute('src');
+
         flavors.push({
             day: dayText,
             name: flavorName,
-            imageUrl: flavorImg
+            imageUrl: flavorImg?.split('?')[0]
         });
     }
     await browser.close();
