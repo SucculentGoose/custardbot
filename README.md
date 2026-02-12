@@ -1,2 +1,2 @@
 # custardbot
-its a custard fotd discord bot
+its the worlds greatest custard flavor of the day discord bot
