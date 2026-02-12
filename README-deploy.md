@@ -66,14 +66,38 @@ sudo journalctl -u custardbot -f
 ```
 
 Docker (portable)
-1. Build and run:
+
+1) Lightweight Node (no Playwright)
+
+Build and run a minimal image:
 
 ```bash
 docker build -t custardbot:latest .
-docker run -d --name custardbot -e TOKEN=$TOKEN -e CLIENT_ID=$CLIENT_ID -e GUILD_ID=$GUILD_ID custardbot:latest
+docker run -d \
+  --name custardbot \
+  -e TOKEN="$TOKEN" \
+  -e CLIENT_ID="$CLIENT_ID" \
+  -e GUILD_ID="$GUILD_ID" \
+  -v $(pwd):/usr/src/app:ro \
+  custardbot:latest
 ```
 
-2. docker-compose:
+2) Playwright + x64 (recommended if you use Playwright)
+
+Use the included Playwright Dockerfile which is based on Microsoft's Playwright image and includes browser dependencies:
+
+```bash
+docker build -f Dockerfile.playwright -t custardbot:playwright .
+docker run -d \
+  --name custardbot \
+  -e TOKEN="$TOKEN" \
+  -e CLIENT_ID="$CLIENT_ID" \
+  -e GUILD_ID="$GUILD_ID" \
+  -v /dev/shm:/dev/shm \
+  custardbot:playwright
+```
+
+3) docker-compose (example)
 
 ```bash
 docker compose up -d --build
@@ -81,7 +105,8 @@ docker compose up -d --build
 
 Notes & Tips
 - Keep `.env` out of version control; use environment variables or a secrets manager for tokens.
-- If you run on ARM (Raspberry Pi), use a compatible base image (node:20-bullseye-slim or arm images) or build on the target.
-- If your bot requires headless browsers (playwright), install additional packages in the Dockerfile (dependencies for chromium) or use playwright's docker images.
+- On an x64 home server the Playwright image is the simplest way to ensure browser dependencies are present.
+- If you prefer pm2, use the `ecosystem.config.js` file included in the repo. First build the project locally (or inside CI) and then run pm2 against `dist/index.js`.
+- If you rely on Playwright, run the Playwright image or install necessary OS packages (libnss3, libatk-1.0-0, libx11-xcb1, etc.) in your base image.
 
-If you tell me which method you prefer (pm2/systemd/Docker) and your server details (x86 vs ARM, uses Playwright?), I can provide a tailored ready-to-run service file or Dockerfile with playwright support.
+If you'd like, I can produce a ready-to-run `systemd` unit or a `docker-compose.yml` tuned for Playwright (with volume mounts and shm settings). Tell me which you prefer and I'll add it.
