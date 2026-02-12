@@ -25,9 +25,19 @@ export async function scrapeUpcomingFotds(location: CulversLocation) {
       process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
   };
 
-  const browser = await playwright.chromium.launch(launchOptions);
-  const context = await browser.newContext();
-  const page = await context.newPage();
+  let browser: playwright.Browser;
+  let context: playwright.BrowserContext;
+  let page: playwright.Page;
+
+  try {
+    browser = await playwright.chromium.launch(launchOptions);
+    context = await browser.newContext();
+    page = await context.newPage(); 
+  } catch (ex) {
+    console.error("Failed to launch browser:", ex);
+    throw ex;
+  }
+  
 
   // Wait for the upcoming panel to exist in the DOM.
   await page.goto(url, { waitUntil: "domcontentloaded" });
