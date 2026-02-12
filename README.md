@@ -2,7 +2,7 @@
 its the worlds greatest custard flavor of the day discord bot
 
 ## Running the bot
-1. Create the following system variables with your own values:
+1. Create the following system environment variables with your own values:
   - TOKEN
   - CLIENT_ID
   - GUILD_ID
