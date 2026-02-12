@@ -31,6 +31,27 @@ class EmbedderGenerator {
     return `${trimmed.slice(0, maxLength - 1)}…`;
   }
 
+  private compactWhitespace(value: string | undefined): string {
+    if (!value) {
+      return "";
+    }
+    return value.replace(/\s+/g, " ").trim();
+  }
+
+  private withImageWidth(imageUrl: string | undefined, width: number): string {
+    if (!imageUrl) {
+      return "";
+    }
+    try {
+      const url = new URL(imageUrl);
+      url.searchParams.set("width", width.toString());
+      return url.toString();
+    } catch (err) {
+      const separator = imageUrl.includes("?") ? "&" : "?";
+      return `${imageUrl}${separator}width=${width}`;
+    }
+  }
+
   private parseOptions(rawOptions: string): string {
     if (!rawOptions) {
       return "Unavailable";
@@ -85,13 +106,24 @@ class EmbedderGenerator {
 
   createFlavorOfTheDayEmbed(location: CulversLocation): EmbedBuilder {
     const imageUrl = location.flavorOfDayImageUrl;
+    const embedImageUrl = this.withImageWidth(imageUrl, 560);
     const restaurantUrl = location.getRestaurantUrl;
     const flavorName = location.flavorOfDayName || "Mystery Custard";
-    const flavorNotes = this.truncate(location.flavorOfTheDayDescription, 700);
+    const flavorNotes = this.truncate(
+      this.compactWhitespace(location.flavorOfTheDayDescription),
+      220,
+    );
     const orderingStatus = this.getOrderingStatus(location.onlineOrderStatus);
-    const handoffOptions = this.parseOptions(location.handoffOptions);
+    const handoffOptions = this.truncate(
+      this.parseOptions(location.handoffOptions),
+      72,
+    );
     const dineInHours = this.parseServiceHours(location.dineInHours, location.utcOffset);
     const driveThruHours = this.parseServiceHours(location.driveThruHours, location.utcOffset);
+    const compactAddress = this.truncate(
+      `${location.street}, ${location.city}, ${location.state} ${location.postalCode}`,
+      110,
+    );
 
     const embed = new EmbedBuilder()
       .setColor(this.FOTD_GOLD)
@@ -100,26 +132,24 @@ class EmbedderGenerator {
       .addFields(
         {
           name: "Location",
-          value: `${location.street}\n${location.city}, ${location.state} ${location.postalCode}`,
-          inline: true,
+          value: compactAddress,
+          inline: false,
         },
         {
           name: "Ordering",
           value: `${orderingStatus}\n${handoffOptions}`,
-          inline: true,
+          inline: false,
         },
         {
           name: "Today's Hours",
           value: `Dine-In: ${dineInHours}\nDrive-Thru: ${driveThruHours}`,
-          inline: true,
+          inline: false,
         },
       )
-      .setImage(imageUrl)
-      .setThumbnail(imageUrl)
+      .setImage(embedImageUrl || imageUrl)
       .setFooter({
         text: `Restaurant #${location.restaurantNumber} • Culver's Custardbot`,
-      })
-      .setTimestamp();
+      });
 
     if (restaurantUrl) {
       embed.setURL(restaurantUrl);
