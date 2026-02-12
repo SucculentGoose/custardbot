@@ -1,5 +1,5 @@
 const playwright = require('playwright');
-const embedder = require('./embedder');
+const embedder = require('./embedderGenerator');
 
 
 async function scrapeUpcomingFotds(locationMetadata) {

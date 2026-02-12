@@ -1,12 +1,13 @@
-const _ = require('underscore');
-const cheerio = require('cheerio');
-var JSSoup = require('jssoup').default;
-const axios = require('axios');
-const embedder = require('./helpers/embedder');
-const networkCalls = require('./network/networkCalls');
+import _ from 'underscore';
+import cheerio from 'cheerio';
+import JSSoup from 'jssoup';
+import axios from 'axios';
+import {embedderGenerator} from '../helpers/embedderGenerator';
+import {networkCalls} from '../network/networkCalls';
+import { CulversLocation } from '../models/CulversLocation';
 
-async function generateUpcomingFotdString(location) {
-  const response = await axios.get(`${networkCalls.getRestaurantUrl(location)}#view-calendar`);
+export async function generateUpcomingFotdString(location: CulversLocation) {
+  const response = await axios.get(`${location.getRestaurantUrl}#view-calendar`);
   const data = response.data;
 
   const $ = cheerio.load(data);
@@ -21,7 +22,7 @@ async function generateUpcomingFotdString(location) {
   if (_.isArray(contents) && contents.length) {
       const flavorsArray = [];
       _.each(contents, content => {
-        const flavorObj = {};
+        const flavorObj: any = {};
         const dateSoup = content.find('h3', 'date');
         if (_.isString(dateSoup.text)) {
           let dateString;
@@ -47,17 +48,11 @@ async function generateUpcomingFotdString(location) {
       });
       const upcomingFotds = [];
       _.each(flavorsArray, flavor => {
-        upcomingFotds.push(embedder.createUpCommingFotdEmbeds(location.City, flavor.date, flavor.flavor, flavor.img));
+        upcomingFotds.push(embedderGenerator.createUpCommingFotdEmbeds(location.city, flavor.date, flavor.flavor, flavor.img));
       });
       return upcomingFotds;
   } else {
     // say nothing found for this location :(
-      return `Nothing found for the city ${location.City}`;
+      return `Nothing found for the city ${location.city}`;
   }
 }
-
-module.exports = {
-  generateUpcomingFotdString
-}
-
-// doStuff();

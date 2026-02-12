@@ -1,11 +1,11 @@
 class StringGenerator {
-  noCulversString(zipcode) {
+  noCulversString(zipcode: string) {
     return `There are no Culvers 🍦 locations 📍 near zip code ${zipcode} 🫡`;
   }
 
-  culversTempClosed(zipcode) {
+  culversTempClosed(zipcode: string) {
     return `The Culvers 🍦 location 📍 near zip code ${zipcode} is temporarily closed 😭`
   }
 }
 
-module.exports = new StringGenerator();
+export const stringGenerator = new StringGenerator();

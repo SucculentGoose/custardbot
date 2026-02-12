@@ -2,24 +2,32 @@
   "name": "custardbot",
   "version": "1.0.0",
   "description": "It's a discord bot to print out the culvers flavor of the day to your discord",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "deploy": "node deploy-commands.js"
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "deploy": "node dist/deploy-commands.js",
+    "dev": "node index.js",
+    "dev:ts": "ts-node ./index.ts",
+    "watch": "tsc -w -p tsconfig.json"
   },
   "author": "SucculentGoose",
   "license": "ISC",
   "dependencies": {
-    "axios": "1.2.2",
-    "cheerio": "^1.0.0-rc.12",
-    "discord.js": "14.7.1",
-    "dotenv": "16.0.3",
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7",
     "jssoup": "0.0.15",
-    "playwright": "^1.44.1",
-    "underscore": "1.13.6"
+    "playwright": "^1.49.1",
+    "underscore": "^1.13.7"
   },
   "devDependencies": {
-    "@playwright/test": "^1.44.1"
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.2",
+    "@types/underscore": "^1.11.15",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
   }
 }
