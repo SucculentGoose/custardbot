@@ -2,6 +2,8 @@ import { EmbedBuilder } from "discord.js";
 import { CulversLocation } from "../models/CulversLocation";
 
 class EmbedderGenerator {
+  private readonly FOTD_GOLD = 0xf5b301;
+
   createEmbeddedItem(
     title: string,
     url: string | undefined,
@@ -18,24 +20,126 @@ class EmbedderGenerator {
     return embedBuilder;
   }
 
+  private truncate(value: string | undefined, maxLength: number): string {
+    if (!value) {
+      return "N/A";
+    }
+    const trimmed = value.trim();
+    if (trimmed.length <= maxLength) {
+      return trimmed;
+    }
+    return `${trimmed.slice(0, maxLength - 1)}…`;
+  }
+
+  private parseOptions(rawOptions: string): string {
+    if (!rawOptions) {
+      return "Unavailable";
+    }
+    try {
+      const parsed = JSON.parse(rawOptions);
+      if (Array.isArray(parsed) && parsed.length) {
+        return parsed.join(" • ");
+      }
+    } catch (err) {
+      return "Unavailable";
+    }
+    return "Unavailable";
+  }
+
+  private getTodayDayPrefix(utcOffset: number): string {
+    const now = new Date();
+    const utcNowMillis = now.getTime() + now.getTimezoneOffset() * 60000;
+    const localMillis = utcNowMillis + utcOffset * 60000;
+    const day = new Date(localMillis).getUTCDay();
+    const dayKeys = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+    return dayKeys[day];
+  }
+
+  private parseServiceHours(hoursJson: string, utcOffset: number): string {
+    if (!hoursJson) {
+      return "Unavailable";
+    }
+    try {
+      const parsed = JSON.parse(hoursJson);
+      const dayPrefix = this.getTodayDayPrefix(utcOffset);
+      const open = parsed?.[`${dayPrefix}O`];
+      const close = parsed?.[`${dayPrefix}C`];
+      if (!open || !close) {
+        return "Unavailable";
+      }
+      return `${open} - ${close}`;
+    } catch (err) {
+      return "Unavailable";
+    }
+  }
+
+  private getOrderingStatus(onlineOrderStatus: number): string {
+    if (onlineOrderStatus === 1) {
+      return "Online ordering available";
+    }
+    if (onlineOrderStatus === 0) {
+      return "Online ordering unavailable";
+    }
+    return "Online ordering status unknown";
+  }
+
   createFlavorOfTheDayEmbed(location: CulversLocation): EmbedBuilder {
     const imageUrl = location.flavorOfDayImageUrl;
+    const restaurantUrl = location.getRestaurantUrl;
+    const flavorName = location.flavorOfDayName || "Mystery Custard";
+    const flavorNotes = this.truncate(location.flavorOfTheDayDescription, 700);
+    const orderingStatus = this.getOrderingStatus(location.onlineOrderStatus);
+    const handoffOptions = this.parseOptions(location.handoffOptions);
+    const dineInHours = this.parseServiceHours(location.dineInHours, location.utcOffset);
+    const driveThruHours = this.parseServiceHours(location.driveThruHours, location.utcOffset);
 
-    return this.createEmbeddedItem(
-      "Flavor of the Day 🍦",
-      location.getRestaurantUrl,
-      `The flavor 🤤 of the day 📅 at ${location.city}, ${location.state} 🗺️ is ${location.flavorOfDayName || "NOTHING 🫡"} 🍦`,
-      imageUrl,
-    );
+    const embed = new EmbedBuilder()
+      .setColor(this.FOTD_GOLD)
+      .setTitle(`Flavor of the Day • ${location.city}, ${location.state}`)
+      .setDescription(`**${flavorName}**\n${flavorNotes}`)
+      .addFields(
+        {
+          name: "Location",
+          value: `${location.street}\n${location.city}, ${location.state} ${location.postalCode}`,
+          inline: true,
+        },
+        {
+          name: "Ordering",
+          value: `${orderingStatus}\n${handoffOptions}`,
+          inline: true,
+        },
+        {
+          name: "Today's Hours",
+          value: `Dine-In: ${dineInHours}\nDrive-Thru: ${driveThruHours}`,
+          inline: true,
+        },
+      )
+      .setImage(imageUrl)
+      .setThumbnail(imageUrl)
+      .setFooter({
+        text: `Restaurant #${location.restaurantNumber} • Culver's Custardbot`,
+      })
+      .setTimestamp();
+
+    if (restaurantUrl) {
+      embed.setURL(restaurantUrl);
+    }
+
+    return embed;
   }
 
   createMultiFlavorOfTheDayEmbeds(location: CulversLocation): EmbedBuilder {
-    return this.createEmbeddedItem(
-      `Flavor of the Day 🍦 at ${location.city}`,
-      undefined,
-      `The flavor 🤤 of the day 📅 located at ${location.street} ${location.city}, ${location.state} 🗺️ is ${location.flavorOfDayName} 🍦`,
-      location.flavorOfDayImageUrl,
-    );
+    const flavorName = location.flavorOfDayName || "Mystery Custard";
+    const flavorNotes = this.truncate(location.flavorOfTheDayDescription, 220);
+    return new EmbedBuilder()
+      .setColor(this.FOTD_GOLD)
+      .setTitle(`🍦 ${location.city}, ${location.state}`)
+      .setDescription(`**${flavorName}**\n${flavorNotes}`)
+      .addFields({
+        name: "Address",
+        value: `${location.street}, ${location.city}, ${location.state} ${location.postalCode}`,
+      })
+      .setThumbnail(location.flavorOfDayImageUrl);
   }
 
   createUpCommingFotdEmbeds(city: string, date: string, flavor: string, image: string): EmbedBuilder {

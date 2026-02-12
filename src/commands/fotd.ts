@@ -1,9 +1,54 @@
 import _ from "underscore";
 import { networkCalls } from "../network/networkCalls";
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  EmbedBuilder,
+  SlashCommandBuilder,
+} from "discord.js";
 import { embedderGenerator } from "../helpers/embedderGenerator";
+import { CulversLocation } from "../models/CulversLocation";
 
 const stringGenerator = require("../helpers/stringGenerator");
+
+function createLocationButtons(
+  location: CulversLocation,
+): ActionRowBuilder<ButtonBuilder>[] {
+  const buttons: ButtonBuilder[] = [];
+  if (location.getRestaurantUrl) {
+    buttons.push(
+      new ButtonBuilder()
+        .setLabel("Restaurant")
+        .setStyle(ButtonStyle.Link)
+        .setURL(location.getRestaurantUrl),
+    );
+  }
+
+  if (location.jobsearchurl) {
+    buttons.push(
+      new ButtonBuilder()
+        .setLabel("Jobs")
+        .setStyle(ButtonStyle.Link)
+        .setURL(location.jobsearchurl),
+    );
+  }
+
+  if (location.oloId) {
+    buttons.push(
+      new ButtonBuilder()
+        .setLabel("Order Online")
+        .setStyle(ButtonStyle.Link)
+        .setURL(`https://order.culvers.com/menu/${location.oloId}`),
+    );
+  }
+
+  if (!buttons.length) {
+    return [];
+  }
+
+  return [new ActionRowBuilder<ButtonBuilder>().addComponents(buttons)];
+}
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -61,7 +106,7 @@ module.exports = {
 
       // Theres no way to know how many locations could be returned, so only show the first 5
       // to the user in discord.
-      for (let i = 0; i <= 5; i++) {
+      for (let i = 0; i < 5; i++) {
         if (locations[i]) {
           fotdEmbeds.push(
             embedderGenerator.createMultiFlavorOfTheDayEmbeds(locations[i]),
@@ -69,10 +114,11 @@ module.exports = {
         }
       }
       // edit the deferred reply with embeds
+      const heading = `Top ${fotdEmbeds.length} nearby Culver's flavor cards for ZIP ${zipcode}`;
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: fotdEmbeds });
+        await interaction.editReply({ content: heading, embeds: fotdEmbeds });
       } else {
-        await interaction.reply({ embeds: fotdEmbeds });
+        await interaction.reply({ content: heading, embeds: fotdEmbeds });
       }
     } else {
       // if showMore is false, just return the first result
@@ -100,15 +146,21 @@ module.exports = {
       }
 
       const embedFotd = embedderGenerator.createFlavorOfTheDayEmbed(location);
+      const components = createLocationButtons(location);
 
       // edit the deferred reply and fetch the updated message so we can react
       const message =
         interaction.deferred || interaction.replied
           ? await interaction.editReply({
               embeds: [embedFotd],
+              components,
               fetchReply: true,
             })
-          : await interaction.reply({ embeds: [embedFotd], fetchReply: true });
+          : await interaction.reply({
+              embeds: [embedFotd],
+              components,
+              fetchReply: true,
+            });
       try {
         await message.react("🔥");
         await message.react("🤮");
