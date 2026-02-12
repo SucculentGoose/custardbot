@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  custardbot:
+    build: .
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - TOKEN
+      - CLIENT_ID
+      - GUILD_ID
+    volumes:
+      - ./:/usr/src/app
+    deploy:
+      resources: {}
