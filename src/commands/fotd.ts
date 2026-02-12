@@ -25,15 +25,6 @@ function createLocationButtons(
     );
   }
 
-  if (location.jobsearchurl) {
-    buttons.push(
-      new ButtonBuilder()
-        .setLabel("Jobs")
-        .setStyle(ButtonStyle.Link)
-        .setURL(location.jobsearchurl),
-    );
-  }
-
   if (location.oloId) {
     buttons.push(
       new ButtonBuilder()
