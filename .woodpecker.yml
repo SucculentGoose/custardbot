@@ -11,21 +11,21 @@ steps:
       REPO_PATH:
         from_secret: repo_path
     commands:
-          - apk add --no-cache rsync openssh-client
+          - apk add --no-cache rsync openssh-client bash
     
           - mkdir -p ~/.ssh && chmod 700 ~/.ssh
           - echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
           - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
     
-          # Clear server dir to avoid partial files
-          - ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts $SSH_USER@$SSH_HOST "rm -rf $REPO_PATH/* $REPO_PATH/.[^.]* 2>/dev/null || true ; mkdir -p $REPO_PATH"
+          - ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts $SSH_USER@$SSH_HOST "rm -rf '${REPO_PATH}'/* '${REPO_PATH}'/.[^.]* 2>/dev/null || true ; mkdir -p '${REPO_PATH}'"
     
-          # Force full rsync copy (ignore times/size, checksum all)
           - /usr/bin/rsync -avz --delete --exclude='node_modules/' --exclude='.git/' --ignore-times --size-only --checksum -e "ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
     
           - ls -la /woodpecker/src/github.com/SucculentGoose/custardbot/
     
-          # Verify files + npm/pm2 (simple quoting, no fnm in SSH)
-          - ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts $SSH_USER@$SSH_HOST "cd $REPO_PATH && ls -la package*.json ecosystem*.js && npm ci --production && npx pm2 reload custardbot || npx pm2 start ecosystem.config.js --env production"
+          - |
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
+              $SSH_USER@$SSH_HOST \
+              "cd $REPO_PATH && ls -la package*.json ecosystem*.js && npm ci --production && npx pm2 reload custardbot || npx pm2 start ecosystem.config.js --env production"
     when:
       branch: main
