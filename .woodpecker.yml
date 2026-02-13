@@ -1,0 +1,13 @@
+steps:
+  test:
+    image: node:20-alpine
+    commands:
+      - npm ci
+
+  deploy:
+    image: node:20-alpine
+    commands:
+      - cd /app
+      - pm2 restart custardbot
+    when:
+      branch: main
