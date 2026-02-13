@@ -1,5 +1,5 @@
 # custardbot
-its the worlds #1 greatest custard flavor of the day discord bot
+its the worlds #1 greatest custard flavor of the day discord bot 🤖
 
 ## Setup
 1. Install Node.js and npm
