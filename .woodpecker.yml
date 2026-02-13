@@ -2,11 +2,11 @@ steps:
   deploy:
     image: node:22-alpine
     commands:
-      - apk add rsync
-      - rsync -av /woodpecker/src/github.com/SucculentGoose/custardbot/ $REPO_PATH/
-      - cd $REPO_PATH
-      - npm ci && npm run build
-      - npm install -g pm2
-      - pm2 reload custardbot
+      - apk add --no-cache rsync openssh-client
+      - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+      - echo "$ssh_key" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+      - ssh-keyscan -H $ssh_host >> ~/.ssh/known_hosts
+      - rsync -avz --delete /woodpecker/src/github.com/SucculentGoose/custardbot/ $ssh_user@$ssh_host:$REPO_PATH/
+      - ssh $ssh_user@$ssh_host "cd $REPO_PATH && pm2 reload custardbot"
     when:
       branch: main
