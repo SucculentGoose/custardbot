@@ -7,6 +7,6 @@ steps:
       - cd $REPO_PATH
       - npm ci && npm run build
       - npm install -g pm2
-      - pm2 trigger custardbot reload # Graceful host reload!
+      - pm2 reload custardbot
     when:
       branch: main
