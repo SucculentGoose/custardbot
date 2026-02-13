@@ -12,16 +12,13 @@ steps:
         from_secret: repo_path
     commands:
       - apk add --no-cache rsync openssh-client
-      # Debug first (remove after fix)
-      - ls -la /woodpecker/src/github.com/SucculentGoose/custardbot/ | grep -i rsync || echo "No conflicting rsync in repo"
-      - which rsync && rsync --version || echo "PATH rsync broken; using full path"
-      - /usr/bin/rsync --version  # Confirm install
 
       - mkdir -p ~/.ssh && chmod 700 ~/.ssh
       - echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
       - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts  # -H hashes hostname
       - /usr/bin/rsync -avz --delete -e "ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
       - /usr/bin/rsync -avz --delete --exclude='node_modules/' --exclude='.git/' -e "ssh -o StrictHostKeyChecking=accept-new" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
+      - ls -la /woodpecker/src/github.com/SucculentGoose/custardbot/
       - ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST 'export PATH="$HOME/.local/share/fnm:$PATH" && eval "$("$HOME/.local/share/fnm/fnm" env --use-on-cd)" && cd $REPO_PATH && npm i && npx pm2 reload custardbot || npx pm2 start ecosystem.config.js --env production'
     when:
       branch: main
