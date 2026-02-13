@@ -11,7 +11,7 @@ steps:
       REPO_PATH:
         from_secret: REPO_PATH
     commands:
-      - apk add --no-cache rsync openssh-client
+      - apk add rsync openssh-client
       - mkdir -p ~/.ssh && chmod 700 ~/.ssh
       - echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
       - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
