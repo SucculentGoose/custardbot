@@ -17,15 +17,16 @@ steps:
       - echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
       - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 
-      # Dry-run to preview (remove after verifying)
-      - /usr/bin/rsync -avz --delete --exclude='node_modules/' --exclude='.git/' --dry-run -e "ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
+      # Clear server first (avoids partial files)
+      - ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts $SSH_USER@$SSH_HOST "rm -rf $REPO_PATH/* $REPO_PATH/.[^.]* ; mkdir -p $REPO_PATH"
 
-      # Real sync with checksum (forces content-based copy, ignores timestamps) + consistent SSH opts
-      - /usr/bin/rsync -avz --delete --exclude='node_modules/' --exclude='.git/' --checksum -e "ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
+      # Force full copy: ignore times/size, checksum everything
+      - /usr/bin/rsync -avz --delete --exclude='node_modules/' --exclude='.git/' --ignore-times --size-only --checksum -e "ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
 
       - ls -la /woodpecker/src/github.com/SucculentGoose/custardbot/
 
-      # Verify files arrived + safer npm/pm2
-      - ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts $SSH_USER@$SSH_HOST 'export PATH="$HOME/.local/share/fnm:$PATH" && eval "$("$HOME/.local/share/fnm/fnm" env --use-on-cd)" && cd $REPO_PATH && ls -la package.json ecosystem.config.js && npm ci --production && npx pm2 reload custardbot || npx pm2 start ecosystem.config.js --env production'
+      # Verify + install
+      - ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts $SSH_USER@$SSH_HOST 'export PATH="$HOME/.local/share/fnm:$PATH" && eval "$("$HOME/.local/share/fnm/fnm" env --use-on-cd)" && cd $REPO_PATH && ls -la package*.json ecosystem*.js && npm ci --production && npx pm2 reload custardbot || npx pm2 start ecosystem.config.js --env production'
+
     when:
       branch: main
