@@ -4,6 +4,7 @@ steps:
     commands:
       - apk add rsync
       - rsync -av /woodpecker/src/ $REPO_PATH
+      - npm ci
       - npm run build
       - pm2 restart custardbot
     when:
