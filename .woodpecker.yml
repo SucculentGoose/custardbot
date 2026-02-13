@@ -7,6 +7,6 @@ steps:
       - cd $REPO_PATH
       - npm ci
       - npm run build
-      - pm2 restart custardbot --no-daemon  # Controls host via cwd
+      - systemctl restart custardbot  # Host service!
     when:
       branch: main
