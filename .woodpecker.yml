@@ -17,6 +17,6 @@ steps:
       SSH_USER:
         from_secret: ssh_user
       REPO_PATH:
-        from_secret: repo_path
+        from_secret: REPO_PATH
     when:
       branch: main
