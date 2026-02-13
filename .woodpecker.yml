@@ -11,12 +11,12 @@ steps:
       REPO_PATH:
         from_secret: repo_path
     commands:
+      - apk add --no-cache rsync openssh-client
       # Debug first (remove after fix)
       - ls -la /woodpecker/src/github.com/SucculentGoose/custardbot/ | grep -i rsync || echo "No conflicting rsync in repo"
       - which rsync && rsync --version || echo "PATH rsync broken; using full path"
       - /usr/bin/rsync --version  # Confirm install
 
-      - apk add --no-cache rsync openssh-client
       - mkdir -p ~/.ssh && chmod 700 ~/.ssh
       - echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
       - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts  # -H hashes hostname
