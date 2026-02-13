@@ -1,13 +1,10 @@
 steps:
-  test:
-    image: node:20-alpine
-    commands:
-      - npm ci
-
   deploy:
-    image: node:20-alpine
+    image: alpine
     commands:
-      - cd /app
+      - apk add rsync
+      - rsync -av /woodpecker/src/ $REPO_PATH
+      - npm run build
       - pm2 restart custardbot
     when:
       branch: main
