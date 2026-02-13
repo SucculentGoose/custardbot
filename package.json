@@ -27,6 +27,7 @@
     "@playwright/test": "^1.49.1",
     "@types/node": "^22.10.2",
     "@types/underscore": "^1.11.15",
+    "pm2": "^6.0.14",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   }

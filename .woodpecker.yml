@@ -21,6 +21,6 @@ steps:
       - echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
       - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts  # -H hashes hostname
       - /usr/bin/rsync -avz --delete -e "ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
-      - ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST 'export PATH="$HOME/.fnm:$PATH" && eval "$('"'"'$HOME/.fnm/fnm'"'"' env --use-on-cd)" && cd $REPO_PATH && pm2 reload custardbot'
+      - ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST 'export PATH="$HOME/.fnm:$PATH" && eval "$($HOME/.fnm/fnm env --use-on-cd)" && cd $REPO_PATH && ./node_modules/.bin/pm2 reload custardbot'
     when:
       branch: main
