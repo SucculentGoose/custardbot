@@ -17,24 +17,29 @@ steps:
           - echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
           - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
     
-          # Debug REPO_PATH
+          # Debug vars
           - echo "REPO_PATH=[$REPO_PATH] SSH_USER=[$SSH_USER] SSH_HOST=[$SSH_HOST]"
     
-          # Use default safe path or set if empty
-          - REPO_PATH=${REPO_PATH:-/home/$SSH_USER/custardbot} && echo "Using REPO_PATH=$REPO_PATH"
+          - REPO_PATH=${REPO_PATH:-/home/$SSH_USER/custardbot}
     
-          # Clear with safe quoting
-          - ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts $SSH_USER@$SSH_HOST "rm -rf '$REPO_PATH'/* '$REPO_PATH'/.[^.]* 2>/dev/null || true ; mkdir -p '$REPO_PATH' && chmod 755 '$REPO_PATH'"
+          # Test SSH key + setup authorized_keys if needed (one-time)
+          - |
+            ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts \
+              -o IdentitiesOnly=yes -o PubkeyAcceptedKeyTypes=+ssh-rsa -i ~/.ssh/id_rsa \
+              $SSH_USER@$SSH_HOST "echo 'SSH key test OK' && mkdir -p ~/.ssh && chmod 700 ~/.ssh || echo "SSH failed - check key in server ~/.ssh/authorized_keys for $SSH_USER (chmod 600/700)"
     
-          # Rsync
-          - /usr/bin/rsync -avz --delete --exclude='node_modules/' --exclude='.git/' --ignore-times --size-only --checksum -e "ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
+          # Now safe rm/mkdir
+          - ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts -o IdentitiesOnly=yes -o PubkeyAcceptedKeyTypes=+ssh-rsa -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "rm -rf '$REPO_PATH'/* '$REPO_PATH'/.[^.]* 2>/dev/null || true ; mkdir -p '$REPO_PATH' && chmod 755 '$REPO_PATH'"
+    
+          # Rsync with RSA fix
+          - /usr/bin/rsync -avz --delete --exclude='node_modules/' --exclude='.git/' --ignore-times --size-only --checksum --rsync-path="sudo rsync" -e "ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts -o IdentitiesOnly=yes -o PubkeyAcceptedKeyTypes=+ssh-rsa -i ~/.ssh/id_rsa" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
     
           - ls -la /woodpecker/src/github.com/SucculentGoose/custardbot/
     
-          # Multi-line SSH for npm/pm2
+          # Final deploy
           - |
-            REPO_PATH=${REPO_PATH:-/home/$SSH_USER/custardbot};
             ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts \
+              -o IdentitiesOnly=yes -o PubkeyAcceptedKeyTypes=+ssh-rsa -i ~/.ssh/id_rsa \
               $SSH_USER@$SSH_HOST \
               "cd '$REPO_PATH' && pwd && ls -la package*.json ecosystem*.js && npm ci --production && npx pm2 reload custardbot || npx pm2 start ecosystem.config.js --env production"
     when:
