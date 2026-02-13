@@ -1,6 +1,6 @@
 steps:
   deploy:
-    image: alpine
+    image: node:22-alpine
     commands:
       - apk add rsync
       - rsync -av /woodpecker/src/ $REPO_PATH
