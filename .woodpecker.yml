@@ -2,14 +2,10 @@ steps:
   deploy:
     image: node:22-alpine
     commands:
-      - apk add rsync procps-ng
+      - apk add rsync
       - rsync -av /woodpecker/src/github.com/SucculentGoose/custardbot/ $REPO_PATH/
       - cd $REPO_PATH
       - npm ci && npm run build
-      - pkill -f "custardbot.*pm2" || true  # Kill PM2 + children
-      - sleep 2
-      - nohup pm2-runtime start ecosystem.config.js --no-daemon > /dev/null 2>&1 &
-      - sleep 5
-      - ps aux | grep custardbot
+      - pm2 trigger custardbot reload # Graceful host reload!
     when:
       branch: main
