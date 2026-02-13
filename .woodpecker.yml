@@ -1,6 +1,6 @@
 steps:
   deploy:
-    image: alpine:latest
+    image: alpine-node22:latest
     environment:
       SSH_KEY:
         from_secret: ssh_key
@@ -11,10 +11,6 @@ steps:
       REPO_PATH:
         from_secret: repo_path
         commands:
-          # Debug source
-          - ls -la /woodpecker/src/github.com/SucculentGoose/custardbot/ | head -10
-          - ls -la /woodpecker/src/github.com/SucculentGoose/custardbot/package*.json ecosystem*.js || echo "Source files missing"
-
           # Rsync source only (no excludes first)
           - /usr/bin/rsync -avz --delete -e "ssh -o StrictHostKeyChecking=accept-new" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
 
