@@ -1,14 +1,6 @@
 steps:
   deploy:
-    image: alpine:latest  # Smaller, full openssh
-    secrets: [ssh_key, ssh_host, ssh_user, repo_path]
-    commands:
-      - apk add --no-cache rsync openssh-client
-      - mkdir -p ~/.ssh && chmod 700 ~/.ssh
-      - echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa  # UPPERCASE!
-      - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts  # No -H
-      - rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
-      - ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cd $REPO_PATH && pm2 reload custardbot"
+    image: alpine:latest
     environment:
       SSH_KEY:
         from_secret: ssh_key
@@ -18,5 +10,12 @@ steps:
         from_secret: ssh_user
       REPO_PATH:
         from_secret: REPO_PATH
+    commands:
+      - apk add --no-cache rsync openssh-client
+      - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+      - echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+      - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+      - rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
+      - ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cd $REPO_PATH && pm2 reload custardbot"
     when:
       branch: main
