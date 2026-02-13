@@ -15,7 +15,7 @@ steps:
       - mkdir -p ~/.ssh && chmod 700 ~/.ssh
       - echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
       - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
-      - rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
+      - /usr/bin/rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" /woodpecker/src/github.com/SucculentGoose/custardbot/ $SSH_USER@$SSH_HOST:$REPO_PATH/
       - ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cd $REPO_PATH && pm2 reload custardbot"
     when:
       branch: main
