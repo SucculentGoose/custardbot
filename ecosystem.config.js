@@ -6,19 +6,19 @@
 module.exports = {
   apps: [
     {
-      name: 'custardbot',
-      script: './dist/index.js', // run the compiled JS
-      cwd: process.cwd(), // change if you deploy elsewhere
+      name: "custardbot",
+      script: "./dist/index.js", // run the compiled JS
+      cwd: __dirname, // always resolve to the project root
       instances: 1,
-      exec_mode: 'fork',
+      exec_mode: "fork",
       autorestart: true,
       watch: false,
-      max_memory_restart: '300M',
+      max_memory_restart: "300M",
       env: {
-        NODE_ENV: 'development',
+        NODE_ENV: "development",
       },
       env_production: {
-        NODE_ENV: 'production',
+        NODE_ENV: "production",
       },
     },
   ],

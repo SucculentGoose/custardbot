@@ -1,4 +1,5 @@
-require("dotenv").config();
+const path = require("node:path");
+require("dotenv").config({ path: path.resolve(__dirname, "..", ".env") });
 
 import {
   ChatInputCommandInteraction,
@@ -10,7 +11,6 @@ import {
 } from "discord.js";
 
 const fs = require("node:fs");
-const path = require("node:path");
 
 type CommandModule = {
   data: SlashCommandBuilder;
