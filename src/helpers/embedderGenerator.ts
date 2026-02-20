@@ -91,7 +91,7 @@ class EmbedderGenerator {
 
   createFlavorOfTheDayEmbed(location: CulversLocation): EmbedBuilder {
     const imageUrl = location.flavorOfDayImageUrl;
-    const embedImageUrl = this.withImageWidth(imageUrl, 560);
+    const embedImageUrl = this.withImageWidth(imageUrl, 300);
     const restaurantUrl = location.getRestaurantUrl;
     const flavorName = location.flavorOfDayName || "Mystery Custard";
     const flavorNotes = this.truncate(
@@ -121,7 +121,7 @@ class EmbedderGenerator {
           inline: false,
         },
       )
-      .setThumbnail(embedImageUrl || imageUrl)
+      .setImage(embedImageUrl || imageUrl)
       .setFooter({
         text: `Restaurant #${location.restaurantNumber} • Culver's Custardbot`,
       });
