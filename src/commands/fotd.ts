@@ -6,7 +6,7 @@ import { EmbedBuilder } from "discord.js";
 import { SlashCommandBuilder } from "discord.js";
 import { embedderGenerator } from "../helpers/embedderGenerator";
 import { CulversLocation } from "../models/CulversLocation";
-import { stringGenerator } from "../helpers/stringGenerator";
+import { noCulversString, culversTempClosed } from "../helpers/stringGenerator";
 
 function createLocationButtons(
   location: CulversLocation,
@@ -64,7 +64,7 @@ module.exports = {
 
     if (showMore) {
       // If we want to show more locations, fetch all the locations
-      let locations;
+      let locations: CulversLocation[];
       try {
         locations = await networkCalls.fetchAllCulversLocations(
           zipcode,
@@ -78,9 +78,9 @@ module.exports = {
       if (!locations || !locations.length) {
         // we already deferred, so edit the deferred reply
         if (interaction.deferred || interaction.replied) {
-          await interaction.editReply(stringGenerator.noCulversString(zipcode));
+          await interaction.editReply(noCulversString(zipcode));
         } else {
-          await interaction.reply(stringGenerator.noCulversString(zipcode));
+          await interaction.reply(noCulversString(zipcode));
         }
         return;
       }
@@ -115,20 +115,18 @@ module.exports = {
       // just make sure we actually got something
       if (!location) {
         if (interaction.deferred || interaction.replied) {
-          await interaction.editReply(stringGenerator.noCulversString(zipcode));
+          await interaction.editReply(noCulversString(zipcode));
         } else {
-          await interaction.reply(stringGenerator.noCulversString(zipcode));
+          await interaction.reply(noCulversString(zipcode));
         }
         return;
       }
 
       if (location?.isTemporarilyClosed) {
         if (interaction.deferred || interaction.replied) {
-          await interaction.editReply(
-            stringGenerator.culversTempClosed(zipcode),
-          );
+          await interaction.editReply(culversTempClosed(zipcode));
         } else {
-          await interaction.reply(stringGenerator.culversTempClosed(zipcode));
+          await interaction.reply(culversTempClosed(zipcode));
         }
         return;
       }

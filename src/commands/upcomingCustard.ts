@@ -1,8 +1,8 @@
-import _ from "underscore";
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import {networkCalls} from "../network/networkCalls";
-import {stringGenerator} from "../helpers/stringGenerator";
+import { EmbedBuilder } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
+import { networkCalls } from "../network/networkCalls";
 import { scrapeUpcomingFotds } from "../helpers/scraper";
+import { noCulversString } from "../helpers/stringGenerator";
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -20,15 +20,15 @@ module.exports = {
     // Get the zipcode that was passed by the user
     const zipcode = interaction.options.getString("zipcode");
     await interaction.deferReply();
-    
+
     const location = await networkCalls.fetchSingleCulversLocation(zipcode);
     if (!location) {
-      interaction.editReply(stringGenerator.noCulversString(zipcode));
+      interaction.editReply(noCulversString(zipcode));
       return;
     }
     try {
-      if (!_.isString(location?.slug) || !location?.slug?.length) {
-        interaction.editReply(stringGenerator.noCulversString(zipcode));
+      if (!location?.slug?.length) {
+        interaction.editReply(noCulversString(zipcode));
         return;
       }
       let upcomingFlavorOfTheDays: EmbedBuilder[];
@@ -41,7 +41,10 @@ module.exports = {
 
       if (upcomingFlavorOfTheDays.length === 1) {
         await interaction.editReply(upcomingFlavorOfTheDays);
-      } else if (Array.isArray(upcomingFlavorOfTheDays) && upcomingFlavorOfTheDays.length > 1) {
+      } else if (
+        Array.isArray(upcomingFlavorOfTheDays) &&
+        upcomingFlavorOfTheDays.length > 1
+      ) {
         await interaction.editReply({ embeds: upcomingFlavorOfTheDays });
       }
     } catch (ex) {
