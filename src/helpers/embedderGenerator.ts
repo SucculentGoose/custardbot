@@ -89,16 +89,6 @@ class EmbedderGenerator {
     }
   }
 
-  private getOrderingStatus(onlineOrderStatus: number): string {
-    if (onlineOrderStatus === 1) {
-      return "Online ordering available";
-    }
-    if (onlineOrderStatus === 0) {
-      return "Online ordering unavailable";
-    }
-    return "Online ordering status unknown";
-  }
-
   createFlavorOfTheDayEmbed(location: CulversLocation): EmbedBuilder {
     const imageUrl = location.flavorOfDayImageUrl;
     const embedImageUrl = this.withImageWidth(imageUrl, 560);
@@ -107,11 +97,6 @@ class EmbedderGenerator {
     const flavorNotes = this.truncate(
       this.compactWhitespace(location.flavorOfTheDayDescription),
       220,
-    );
-    const orderingStatus = this.getOrderingStatus(location.onlineOrderStatus);
-    const handoffOptions = this.truncate(
-      this.parseOptions(location.handoffOptions),
-      72,
     );
     const dineInHours = this.parseServiceHours(location.dineInHours, location.utcOffset);
     const driveThruHours = this.parseServiceHours(location.driveThruHours, location.utcOffset);
@@ -128,11 +113,6 @@ class EmbedderGenerator {
         {
           name: "Location",
           value: compactAddress,
-          inline: false,
-        },
-        {
-          name: "Ordering",
-          value: `${orderingStatus}\n${handoffOptions}`,
           inline: false,
         },
         {
