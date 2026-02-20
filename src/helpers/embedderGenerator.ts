@@ -4,12 +4,7 @@ import { CulversLocation } from "../models/CulversLocation";
 class EmbedderGenerator {
   private readonly FOTD_GOLD = 0xf5b301;
 
-  createEmbeddedItem(
-    title: string,
-    url: string | undefined,
-    description: string,
-    image: string,
-  ): EmbedBuilder {
+  createEmbeddedItem(title: string, url: string | undefined, description: string, image: string): EmbedBuilder {
     const embedBuilder = new EmbedBuilder()
       .setTitle(title)
       .setDescription(description)
@@ -146,7 +141,7 @@ class EmbedderGenerator {
           inline: false,
         },
       )
-      .setImage(embedImageUrl || imageUrl)
+      .setThumbnail(embedImageUrl || imageUrl)
       .setFooter({
         text: `Restaurant #${location.restaurantNumber} • Culver's Custardbot`,
       });

@@ -1,16 +1,12 @@
-import _ from "underscore";
 import { networkCalls } from "../network/networkCalls";
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  EmbedBuilder,
-  SlashCommandBuilder,
-} from "discord.js";
+import { ActionRowBuilder } from "discord.js";
+import { ButtonBuilder } from "discord.js";
+import { ButtonStyle } from "discord.js";
+import { EmbedBuilder } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 import { embedderGenerator } from "../helpers/embedderGenerator";
 import { CulversLocation } from "../models/CulversLocation";
-
-const stringGenerator = require("../helpers/stringGenerator");
+import { stringGenerator } from "../helpers/stringGenerator";
 
 function createLocationButtons(
   location: CulversLocation,
@@ -22,15 +18,6 @@ function createLocationButtons(
         .setLabel("Restaurant")
         .setStyle(ButtonStyle.Link)
         .setURL(location.getRestaurantUrl),
-    );
-  }
-
-  if (location.oloId) {
-    buttons.push(
-      new ButtonBuilder()
-        .setLabel("Order Online")
-        .setStyle(ButtonStyle.Link)
-        .setURL(`https://order.culvers.com/menu/${location.oloId}`),
     );
   }
 
@@ -77,13 +64,18 @@ module.exports = {
 
     if (showMore) {
       // If we want to show more locations, fetch all the locations
-      const locations = await networkCalls.fetchAllCulversLocations(
-        zipcode,
-        showMore,
-      );
+      let locations;
+      try {
+        locations = await networkCalls.fetchAllCulversLocations(
+          zipcode,
+          showMore,
+        );
+      } catch (err) {
+        console.error("Error fetching locations:", err);
+      }
 
       // just make sure we actually got something
-      if (_.isUndefined(locations)) {
+      if (!locations || !locations.length) {
         // we already deferred, so edit the deferred reply
         if (interaction.deferred || interaction.replied) {
           await interaction.editReply(stringGenerator.noCulversString(zipcode));
@@ -113,10 +105,15 @@ module.exports = {
       }
     } else {
       // if showMore is false, just return the first result
-      const location = await networkCalls.fetchSingleCulversLocation(zipcode);
+      let location;
+      try {
+        location = await networkCalls.fetchSingleCulversLocation(zipcode);
+      } catch (err) {
+        console.error("Error fetching single location:", err);
+      }
 
       // just make sure we actually got something
-      if (_.isUndefined(location)) {
+      if (!location) {
         if (interaction.deferred || interaction.replied) {
           await interaction.editReply(stringGenerator.noCulversString(zipcode));
         } else {
