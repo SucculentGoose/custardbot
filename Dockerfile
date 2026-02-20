@@ -33,9 +33,6 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json* ./
 RUN npm ci --omit=dev
 
-# Install Playwright browser binaries
-RUN npx playwright install chromium
-
 COPY --from=build /usr/src/app/dist ./dist
 
 # Tell Playwright to use the system Chromium installed via apk
